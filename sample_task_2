@@ -1,0 +1,65 @@
+Display the group (I, II, III), username, number of steps that the user has completed according to the corresponding method. Name the columns Group, Student, Number_of_steps. Sort the information in ascending order of group numbers, then in descending order of number of steps, and finally by student name in alphabetical order.
+
+update step_student set result = if(result = 'correct', '1', '0');
+
+
+-- good group 1
+with sub_sum1(student_name, step_id, result, raz) as (
+    select student_name, step_id, result,
+    lead(result) OVER (PARTITION BY student_name, step_id order by submission_time) Raz
+    from step_student
+    inner join student using (student_id)   
+    order by submission_time),
+
+sum1(student_name, step_id, sum1, raz) as (
+    select student_name, step_id, result, raz
+    from sub_sum1
+    where (raz - result) = -1
+    order by 1
+    ),
+
+-- good group 2
+sum2(student_name, sum2) as (   
+    select student_name,
+    sum(result) sum2
+    from step_student
+    inner join student using (student_id)    
+     group by student_name, step_id
+    having sum(result) >= 2      
+    order by 1),
+
+-- good group 3
+sum3(student_name, sum3) as (
+    select student_name,
+    sum(result) sum3
+    from step_student
+    inner join student using (student_id)
+    group by student_name, step_id
+    having sum(result) = 0
+    order by 1)
+
+-- I start to join of all three good groups through union all and do the sorting in each individual group
+-- nice group 1 (9)
+
+select t1.* from
+    (select 'I' as Group, sum1.student_name Student, count(sum1) Number_of_steps
+    from sum1
+    group by sum1.student_name
+    order by count(sum1) desc, sum1.student_name
+    ) t1
+union all
+-- nice group 2 (16)
+select t2.* from 
+    (select 'II' Group,
+    sum2.student_name Student, count(sum2) Number_of_steps
+    from sum2
+    group by sum2.student_name
+     order by count(sum2) desc) t2
+union all
+-- nice group 3 (7)
+select t3.* from
+    (select 'III' as Group,
+    sum3.student_name Student, count(sum3) Number_of_steps
+    from sum3
+    group by sum3.student_name
+    order by count(sum3) desc) t3
