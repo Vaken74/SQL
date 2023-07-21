@@ -1,0 +1,36 @@
+Task: Calculate the average time for which users complete the lesson
+
+with step_time_t (lesson_name, st_id, step_idd, step_time)
+        as (    
+            select lesson_name, student_id, step_id, sum(submission_time - attempt_time)
+            from step_student
+            inner join step using (step_id)
+            inner join lesson using (lesson_id)
+            where (submission_time - attempt_time) < 4 * 3600     
+            group by 1,2,3
+            order by 1,2,3
+          ),
+    lesson_time_t (stu_id, lesson_name, lesson_time)
+            as 
+            (    
+            select st_id, lesson_name, sum(step_time) as lesson_time
+            from  step_time_t
+            group by 1,2
+            order by lesson_time
+            ),        
+            
+    average_time_t (lesson_namee, average_time)
+            as
+            (    
+            select
+            lesson_name, round(avg(lesson_time / 3600), 2) Avverage_time
+            from lesson_time_t
+            group by 1
+           )
+     select row_number() over (order by (average_time)) Номер,
+     
+     concat (module_id,'.', lesson_position,' ', average_time_t.lesson_namee) as Lesson, average_time Avverage_time
+    from average_time_t
+    inner join lesson on lesson.lesson_name = average_time_t.lesson_namee
+    inner join module using (module_id)
+
