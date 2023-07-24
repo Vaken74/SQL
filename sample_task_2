@@ -1,6 +1,6 @@
-Display the group (I, II, III), username, number of steps that the user has completed according to the corresponding method. Name the columns Group, Student, Number_of_steps. Sort the information in ascending order of group numbers, then in descending order of number of steps, and finally by student name in alphabetical order.
+-- Display the group (I, II, III), username, number of steps that the user has completed according to the corresponding method. Name the columns Group, Student, Number_of_steps. Sort the information in ascending order of group numbers, then in descending order of number of steps, and finally by student name in alphabetical order.
 
-update step_student set result = if(result = 'correct', '1', '0');
+-- update step_student set result = if(result = 'correct', '1', '0');
 
 
 -- good group 1
