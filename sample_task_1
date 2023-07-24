@@ -1,4 +1,4 @@
-Task: Calculate the average time for which users complete the lesson
+-- Task: Calculate the average time for which users complete the lesson
 
 with step_time_t (lesson_name, st_id, step_idd, step_time)
         as (    
